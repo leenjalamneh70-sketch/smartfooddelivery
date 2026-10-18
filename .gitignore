@@ -1,0 +1,14 @@
+
+# Maven build files
+/target/
+
+# Eclipse generated files
+/.metadata/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Sensitive files
+.env
+*.log
