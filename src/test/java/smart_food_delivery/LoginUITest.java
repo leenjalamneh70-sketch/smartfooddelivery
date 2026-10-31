@@ -13,41 +13,55 @@ import org.junit.jupiter.api.Test;
 
 import smart_food_delivery.presentation.LoginUI;
 
+/**
+ * Tests the console-based login interface.
+ *
+ * Verifies successful and unsuccessful login attempts
+ * using user credentials stored in users.txt.
+ */
 class LoginUITest {
 
+    /**
+     * Simulates user input and captures console output.
+     *
+     * @param username the entered username
+     * @param password the entered password
+     * @return the console output produced by LoginUI
+     */
     private String runLogin(String username, String password) {
 
         InputStream originalIn = System.in;
         PrintStream originalOut = System.out;
 
         String userInput =
-            username + System.lineSeparator()
-            + password + System.lineSeparator();
+                username + System.lineSeparator()
+                + password + System.lineSeparator();
 
         ByteArrayInputStream input =
-            new ByteArrayInputStream(
-                userInput.getBytes(StandardCharsets.UTF_8)
-            );
+                new ByteArrayInputStream(
+                        userInput.getBytes(StandardCharsets.UTF_8)
+                );
 
         ByteArrayOutputStream output =
-            new ByteArrayOutputStream();
+                new ByteArrayOutputStream();
 
         try {
             System.setIn(input);
             System.setOut(
-                new PrintStream(output, true, "UTF-8")
+                    new PrintStream(output, true, "UTF-8")
             );
 
             LoginUI.main(new String[0]);
 
             return new String(
-                output.toByteArray(),
-                StandardCharsets.UTF_8
+                    output.toByteArray(),
+                    StandardCharsets.UTF_8
             );
 
         } catch (java.io.UnsupportedEncodingException e) {
+
             throw new AssertionError(
-                "UTF-8 encoding is not supported", e
+                    "UTF-8 encoding is not supported", e
             );
 
         } finally {
@@ -56,6 +70,9 @@ class LoginUITest {
         }
     }
 
+    /**
+     * Tests successful login for Leen.
+     */
     @Test
     void testSuccessfulLogin() {
 
@@ -66,39 +83,74 @@ class LoginUITest {
         assertTrue(output.contains("Login successful!"));
     }
 
+    /**
+     * Tests login with an incorrect password.
+     */
     @Test
     void testInvalidPassword() {
 
         String output = runLogin("leen", "wrong");
 
         assertTrue(
-            output.contains(
-                "Error: Invalid username or password."
-            )
+                output.contains(
+                        "Error: Invalid username or password."
+                )
         );
     }
 
+    /**
+     * Tests login with an unknown username.
+     */
     @Test
     void testInvalidUsername() {
 
         String output = runLogin("wrong", "1234");
 
         assertTrue(
-            output.contains(
-                "Error: Invalid username or password."
-            )
+                output.contains(
+                        "Error: Invalid username or password."
+                )
         );
     }
 
+    /**
+     * Tests login with both credentials incorrect.
+     */
     @Test
     void testBothCredentialsInvalid() {
 
         String output = runLogin("wrong", "wrong");
 
         assertTrue(
-            output.contains(
-                "Error: Invalid username or password."
-            )
+                output.contains(
+                        "Error: Invalid username or password."
+                )
+        );
+    }
+
+    /**
+     * Tests successful login for Nabila from users.txt.
+     */
+    @Test
+    void testNabilaLoginFromFile() {
+
+        String output = runLogin("nabila", "5678");
+
+        assertTrue(
+                output.contains("Login successful!")
+        );
+    }
+
+    /**
+     * Tests successful login for Admin from users.txt.
+     */
+    @Test
+    void testAdminLoginFromFile() {
+
+        String output = runLogin("admin", "9999");
+
+        assertTrue(
+                output.contains("Login successful!")
         );
     }
 }

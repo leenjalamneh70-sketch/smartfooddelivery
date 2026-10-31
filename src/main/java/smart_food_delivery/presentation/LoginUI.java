@@ -1,7 +1,6 @@
 
 package smart_food_delivery.presentation;
 
-import smart_food_delivery.domain.User;
 import smart_food_delivery.service.LoginService;
 import java.util.Scanner;
 
@@ -9,27 +8,22 @@ import java.util.Scanner;
  * Provides a console-based login interface
  * for the Smart Food Delivery Management System.
  *
- * This class allows the user to enter a username
- * and password, validates the credentials using
- * LoginService, and displays the login result.
+ * Reads user credentials and validates them
+ * against users stored in users.txt.
  */
 public class LoginUI {
 
     /**
      * Starts the login interface.
      *
-     * Creates a sample user, reads the entered
-     * username and password from the console,
-     * and checks the credentials using LoginService.
-     *
-     * Displays a success message if the credentials
-     * are correct, or an error message otherwise.
+     * Reads the entered username and password,
+     * validates them using LoginService,
+     * and displays the login result.
      *
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
 
-        User user = new User("leen", "1234", "costumer");
         LoginService service = new LoginService();
 
         Scanner input = new Scanner(System.in);
@@ -41,7 +35,7 @@ public class LoginUI {
         String enteredPassword = input.nextLine();
 
         boolean result = service.login(
-            enteredUsername, enteredPassword, user
+                enteredUsername, enteredPassword
         );
 
         if (result) {

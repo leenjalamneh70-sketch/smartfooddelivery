@@ -1,0 +1,3 @@
+leen,1234,customer
+nabila,5678,customer
+admin,9999,manager
