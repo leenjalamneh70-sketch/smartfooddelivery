@@ -3,35 +3,42 @@ package smart_food_delivery.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import smart_food_delivery.domain.*;
 
 /**
  * Manages driver assignment and order delivery status
  * in the Smart Food Delivery Management System.
  *
- * This service uses a driver selection strategy to
- * choose an eligible driver based on the order's
- * delivery distance and total item quantity.
+ * Uses a driver selection strategy to choose an eligible
+ * driver based on delivery distance and order size.
  *
- * It also validates order status transitions and
- * sends notifications when a driver is assigned
- * or an order status changes.
+ * Implements the Observer Pattern by allowing observers
+ * to register and receive notifications when a driver
+ * is assigned or an order status changes.
+ *
+ * Maintains the existing NotificationService to preserve
+ * compatibility with the original notification system.
  */
 public class DeliveryService {
 
     private DriverSelectionStrategy strategy;
     private NotificationService notificationService;
 
+    // Registered observers for order-related events.
+    private final List<OrderObserver> observers = new ArrayList<>();
+
     /**
-     * Creates a delivery service with the required
-     * driver selection strategy and notification service.
+     * Creates a delivery service with a driver selection
+     * strategy and a notification service.
      *
-     * @param strategy the strategy used to select a driver
-     * @param notificationService the service used to send notifications
-     * @throws IllegalArgumentException if either dependency is null
+     * @param strategy strategy used to select drivers
+     * @param notificationService service used for notifications
+     * @throws IllegalArgumentException if a dependency is null
      */
-    public DeliveryService(DriverSelectionStrategy strategy,
-                           NotificationService notificationService) {
+    public DeliveryService(
+            DriverSelectionStrategy strategy,
+            NotificationService notificationService) {
 
         if (strategy == null || notificationService == null) {
             throw new IllegalArgumentException(
@@ -43,19 +50,66 @@ public class DeliveryService {
     }
 
     /**
+     * Registers an observer for order-related events.
+     *
+     * The same observer cannot be registered twice.
+     *
+     * @param observer observer to register
+     * @throws IllegalArgumentException if observer is null
+     */
+    public void addObserver(OrderObserver observer) {
+
+        if (observer == null) {
+            throw new IllegalArgumentException(
+                "Observer cannot be null");
+        }
+
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    /**
+     * Removes an observer from the registered list.
+     *
+     * @param observer observer to remove
+     */
+    public void removeObserver(OrderObserver observer) {
+
+        observers.remove(observer);
+    }
+
+    /**
+     * Sends an event notification to all registered
+     * observers.
+     *
+     * A copy of the list is used to prevent modification
+     * problems during notification.
+     *
+     * @param message notification message
+     */
+    private void notifyObservers(String message) {
+
+        for (OrderObserver observer : new ArrayList<>(observers)) {
+            observer.update(message);
+        }
+    }
+
+    /**
      * Assigns an eligible driver to an order.
      *
-     * The method calculates the total quantity of ordered
-     * items and checks each driver's delivery eligibility.
+     * Calculates the total quantity of ordered items
+     * and checks driver eligibility.
      *
      * Only eligible drivers are passed to the selection
-     * strategy. After assignment, the driver becomes
-     * unavailable and a notification is sent.
+     * strategy.
      *
-     * @param order the order requiring a delivery driver
-     * @param drivers the list of available driver candidates
-     * @return true if a driver was successfully assigned,
-     *         otherwise false
+     * After successful assignment, the driver becomes
+     * unavailable and all observers are notified.
+     *
+     * @param order order requiring a delivery driver
+     * @param drivers available driver candidates
+     * @return true if a driver was assigned, otherwise false
      */
     public boolean assignDriver(Order order, List<Driver> drivers) {
 
@@ -68,8 +122,9 @@ public class DeliveryService {
 
         double distance = order.getDeliveryDistance();
 
-        // Total quantity represents order size
+        // Calculate the total quantity of ordered items.
         int orderSize = 0;
+
         for (OrderItem item : order.getItems()) {
             orderSize += item.getQuantity();
         }
@@ -77,8 +132,10 @@ public class DeliveryService {
         List<Driver> eligibleDrivers = new ArrayList<>();
 
         for (Driver driver : drivers) {
+
             if (driver != null
                     && driver.canDeliver(distance, orderSize)) {
+
                 eligibleDrivers.add(driver);
             }
         }
@@ -98,10 +155,13 @@ public class DeliveryService {
         order.setAssignedDriver(driver);
         driver.setAvailable(false);
 
-        notificationService.sendNotification(
-            "Driver " + driver.getName()
-            + " assigned to order #" + order.getId()
-        );
+        // Notify the existing notification service
+        // and all registered observers.
+        String message = "Driver " + driver.getName()
+                + " assigned to order #" + order.getId();
+
+        notificationService.sendNotification(message);
+        notifyObservers(message);
 
         return true;
     }
@@ -110,30 +170,31 @@ public class DeliveryService {
      * Updates the status of an order according to
      * the allowed delivery workflow.
      *
-     * Valid status transitions are:
+     * Valid transitions:
      *
-     * PENDING to CONFIRMED
-     * CONFIRMED to PREPARING
-     * PREPARING to READY
-     * READY to OUT_FOR_DELIVERY
-     * OUT_FOR_DELIVERY to DELIVERED
+     * PENDING -> CONFIRMED
+     * CONFIRMED -> PREPARING
+     * PREPARING -> READY
+     * READY -> OUT_FOR_DELIVERY
+     * OUT_FOR_DELIVERY -> DELIVERED
      *
      * An order must have an assigned driver before
      * moving to OUT_FOR_DELIVERY.
      *
-     * A notification is sent after each successful
-     * status update. When an order is delivered,
-     * its assigned driver becomes available again.
+     * A notification is sent after every successful
+     * status change.
      *
-     * @param order the order to update
-     * @param newStatus the requested new order status
-     * @throws IllegalArgumentException if the order
-     *         or new status is null
-     * @throws IllegalStateException if the order is
-     *         completed, cancelled, or the transition
-     *         is not allowed
+     * When an order is delivered, the assigned driver
+     * becomes available again.
+     *
+     * @param order order to update
+     * @param newStatus requested order status
+     * @throws IllegalArgumentException if an argument is null
+     * @throws IllegalStateException if the transition is invalid
      */
-    public void updateOrderStatus(Order order, OrderStatus newStatus) {
+    public void updateOrderStatus(
+            Order order,
+            OrderStatus newStatus) {
 
         if (order == null || newStatus == null) {
             throw new IllegalArgumentException(
@@ -142,8 +203,9 @@ public class DeliveryService {
 
         OrderStatus current = order.getStatus();
 
-        if (current == OrderStatus.CANCELLED ||
-            current == OrderStatus.DELIVERED) {
+        if (current == OrderStatus.CANCELLED
+                || current == OrderStatus.DELIVERED) {
+
             throw new IllegalStateException(
                 "Order cannot be modified");
         }
@@ -166,7 +228,7 @@ public class DeliveryService {
 
             case READY:
                 valid = newStatus == OrderStatus.OUT_FOR_DELIVERY
-                     && order.getAssignedDriver() != null;
+                        && order.getAssignedDriver() != null;
                 break;
 
             case OUT_FOR_DELIVERY:
@@ -184,12 +246,17 @@ public class DeliveryService {
 
         order.setStatus(newStatus);
 
-        notificationService.sendNotification(
-            "Order #" + order.getId()
-            + " status changed to " + newStatus
-        );
+        // Notify the existing notification service
+        // and all registered observers.
+        String message = "Order #" + order.getId()
+                + " status changed to " + newStatus;
 
+        notificationService.sendNotification(message);
+        notifyObservers(message);
+
+        // Make the driver available after delivery.
         if (newStatus == OrderStatus.DELIVERED) {
+
             if (order.getAssignedDriver() != null) {
                 order.getAssignedDriver().setAvailable(true);
             }
