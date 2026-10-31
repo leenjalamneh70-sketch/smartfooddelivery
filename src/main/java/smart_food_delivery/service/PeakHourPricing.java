@@ -13,6 +13,15 @@ package smart_food_delivery.service;
 public class PeakHourPricing implements PricingStrategy {
 
     /**
+     * Creates a peak-hour pricing strategy.
+     *
+     * This strategy applies a 20 percent increase
+     * to the original order total.
+     */
+    public PeakHourPricing() {
+    }
+
+    /**
      * Calculates the order price by applying
      * a 20 percent peak-hour increase.
      *
@@ -21,6 +30,7 @@ public class PeakHourPricing implements PricingStrategy {
      */
     @Override
     public double calculatePrice(double orderTotal) {
+
         return orderTotal * 1.20;
     }
 }

@@ -17,6 +17,15 @@ import smart_food_delivery.domain.Driver;
 public class FastestDriverStrategy implements DriverSelectionStrategy {
 
     /**
+     * Creates a fastest-driver selection strategy.
+     *
+     * This strategy selects the available driver
+     * with the shortest estimated delivery time.
+     */
+    public FastestDriverStrategy() {
+    }
+
+    /**
      * Selects the available driver with the shortest
      * estimated delivery time.
      *
@@ -44,7 +53,9 @@ public class FastestDriverStrategy implements DriverSelectionStrategy {
             }
 
             if (fastest == null ||
-                driver.getEstimatedMinutes() < fastest.getEstimatedMinutes()) {
+                    driver.getEstimatedMinutes()
+                    < fastest.getEstimatedMinutes()) {
+
                 fastest = driver;
             }
         }

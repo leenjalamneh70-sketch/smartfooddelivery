@@ -17,6 +17,15 @@ import smart_food_delivery.domain.Driver;
 public class NearestDriverStrategy implements DriverSelectionStrategy {
 
     /**
+     * Creates a nearest-driver selection strategy.
+     *
+     * This strategy selects the available driver
+     * with the shortest distance.
+     */
+    public NearestDriverStrategy() {
+    }
+
+    /**
      * Selects the available driver with the shortest distance.
      *
      * Null drivers, unavailable drivers, and drivers
@@ -43,7 +52,7 @@ public class NearestDriverStrategy implements DriverSelectionStrategy {
             }
 
             if (nearest == null ||
-                driver.getDistance() < nearest.getDistance()) {
+                    driver.getDistance() < nearest.getDistance()) {
                 nearest = driver;
             }
         }

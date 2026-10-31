@@ -14,6 +14,15 @@ package smart_food_delivery.service;
 public class NormalPricing implements PricingStrategy {
 
     /**
+     * Creates a normal pricing strategy.
+     *
+     * This strategy uses the original order total
+     * without applying extra fees or discounts.
+     */
+    public NormalPricing() {
+    }
+
+    /**
      * Calculates the normal price of an order.
      *
      * Returns the original order total without
@@ -24,6 +33,7 @@ public class NormalPricing implements PricingStrategy {
      */
     @Override
     public double calculatePrice(double orderTotal) {
+
         return orderTotal;
     }
 }

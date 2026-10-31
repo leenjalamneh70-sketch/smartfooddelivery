@@ -18,6 +18,16 @@ import smart_food_delivery.domain.MenuItem;
 public class RestaurantService {
 
     /**
+     * Creates a restaurant service.
+     *
+     * This service provides operations for finding
+     * open restaurants and retrieving available
+     * menu items.
+     */
+    public RestaurantService() {
+    }
+
+    /**
      * Returns a list of restaurants that are currently open.
      *
      * Null restaurants and closed restaurants are excluded.

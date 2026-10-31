@@ -13,6 +13,15 @@ package smart_food_delivery.service;
 public class ExpressPricing implements PricingStrategy {
 
     /**
+     * Creates an express pricing strategy.
+     *
+     * This strategy applies a fixed additional
+     * fee of 10 to the original order total.
+     */
+    public ExpressPricing() {
+    }
+
+    /**
      * Calculates the price of an express order
      * by adding a fixed fee of 10.
      *
@@ -21,6 +30,7 @@ public class ExpressPricing implements PricingStrategy {
      */
     @Override
     public double calculatePrice(double orderTotal) {
+
         return orderTotal + 10;
     }
 }

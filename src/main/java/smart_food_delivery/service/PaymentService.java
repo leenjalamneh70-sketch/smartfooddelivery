@@ -15,6 +15,15 @@ import smart_food_delivery.domain.PaymentStatus;
 public class PaymentService {
 
     /**
+     * Creates a payment service.
+     *
+     * This service processes cash payments
+     * for successfully delivered orders.
+     */
+    public PaymentService() {
+    }
+
+    /**
      * Processes a cash payment for a delivered order.
      *
      * The payment is accepted only if the order exists,

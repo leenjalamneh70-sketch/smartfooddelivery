@@ -22,6 +22,15 @@ public class OrderService {
     private int nextId = 1;
 
     /**
+     * Creates an order management service.
+     *
+     * The service initially contains no orders,
+     * and order IDs start from 1.
+     */
+    public OrderService() {
+    }
+
+    /**
      * Places a standard order using the original
      * order creation method.
      *

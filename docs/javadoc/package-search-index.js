@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"smart_food_delivery.domain"},{"l":"smart_food_delivery.presentation"},{"l":"smart_food_delivery.service"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"smart_food_delivery.domain"},{"l":"smart_food_delivery.presentation"},{"l":"smart_food_delivery.repository"},{"l":"smart_food_delivery.service"}];updateSearchResults();

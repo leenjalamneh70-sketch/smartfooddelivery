@@ -14,6 +14,15 @@ import java.util.Scanner;
 public class LoginUI {
 
     /**
+     * Creates a console-based login interface.
+     *
+     * The interface allows users to enter their
+     * credentials for authentication.
+     */
+    public LoginUI() {
+    }
+
+    /**
      * Starts the login interface.
      *
      * Reads the entered username and password,

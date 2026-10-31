@@ -13,6 +13,15 @@ package smart_food_delivery.service;
 public class PromotionalPricing implements PricingStrategy {
 
     /**
+     * Creates a promotional pricing strategy.
+     *
+     * This strategy applies a 10 percent discount
+     * to the original order total.
+     */
+    public PromotionalPricing() {
+    }
+
+    /**
      * Calculates the order price after applying
      * a 10 percent promotional discount.
      *
@@ -21,6 +30,7 @@ public class PromotionalPricing implements PricingStrategy {
      */
     @Override
     public double calculatePrice(double orderTotal) {
+
         return orderTotal * 0.90;
     }
 }

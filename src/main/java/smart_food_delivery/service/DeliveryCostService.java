@@ -13,6 +13,15 @@ public class DeliveryCostService {
     private static final double COST_PER_KM = 2.0;
 
     /**
+     * Creates a delivery cost service.
+     *
+     * The service calculates delivery costs
+     * using a fixed rate of 2.0 per kilometer.
+     */
+    public DeliveryCostService() {
+    }
+
+    /**
      * Calculates the delivery cost based on distance.
      *
      * The cost is calculated by multiplying the
@@ -27,8 +36,9 @@ public class DeliveryCostService {
 
         if (Double.isNaN(distance) || Double.isInfinite(distance)
                 || distance < 0) {
+
             throw new IllegalArgumentException(
-                "Invalid delivery distance");
+                    "Invalid delivery distance");
         }
 
         return distance * COST_PER_KM;
