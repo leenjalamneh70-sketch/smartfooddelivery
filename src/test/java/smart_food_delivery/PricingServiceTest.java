@@ -60,10 +60,9 @@ class PricingServiceTest {
     @Test
     void testExpressPricing() {
 
-        double result =
-            service.calculateFinalBill(order, new ExpressPricing(), 5);
-
-        assertEquals(120, result, 0.001);
+        assertThrows(IllegalArgumentException.class, () ->
+            service.calculateFinalBill(order, new ExpressPricing(), 5)
+        );
     }
 
     @Test
@@ -91,5 +90,34 @@ class PricingServiceTest {
         assertThrows(IllegalStateException.class, () ->
             service.calculateFinalBill(order, new NormalPricing(), 5)
         );
+    }
+    @Test
+    void testValidExpressPricing() {
+
+        Restaurant restaurant =
+            new Restaurant("Pizza House", true, 20, "City");
+
+        MenuItem pizza = new MenuItem("Pizza", 50, true);
+        restaurant.addMenuItem(pizza);
+
+        OrderService orderService = new OrderService();
+
+        ExpressOrder expressOrder = orderService.placeExpressOrder(
+            restaurant,
+            Arrays.asList(new OrderItem(pizza, 2)),
+            "Main Street",
+            "City",
+            10.0
+        );
+
+        double result = service.calculateFinalBill(
+            expressOrder,
+            new ExpressPricing(),
+            5
+        );
+
+        assertEquals(120.0, result, 0.001);
+        assertEquals(120.0, expressOrder.getFinalBill(), 0.001);
+        assertEquals(10.0, expressOrder.getDeliveryFee(), 0.001);
     }
 }
