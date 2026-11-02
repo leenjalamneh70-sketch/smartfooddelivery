@@ -33,7 +33,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn --batch-mode sonar:sonar \
+          mvn --batch-mode org.sonarsource.scanner.maven:sonar-maven-plugin:5.2.0.4988:sonar \
             -Dsonar.projectKey=leenjalamneh70-sketch_smartfooddelivery \
             -Dsonar.organization=leenjalamneh70-sketch \
             -Dsonar.host.url=https://sonarcloud.io \
