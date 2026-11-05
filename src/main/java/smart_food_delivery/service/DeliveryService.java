@@ -47,6 +47,11 @@ public class DeliveryService {
 
         this.strategy = strategy;
         this.notificationService = notificationService;
+
+        // Default observers for the three required notification audiences.
+        addObserver(new CustomerOrderObserver());
+        addObserver(new RestaurantOrderObserver());
+        addObserver(new DriverOrderObserver());
     }
 
     /**

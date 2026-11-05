@@ -41,8 +41,8 @@ public class Order {
      * @param items ordered menu items
      * @param deliveryAddress customer delivery address
      * @param deliveryZone delivery area
-     * @throws IllegalArgumentException if the restaurant
-     *         is null or the items list is null or empty
+     * @throws IllegalArgumentException if restaurant
+     *         is null or items are null or empty
      */
     public Order(int id, Restaurant restaurant,
                  List<OrderItem> items,
@@ -65,6 +65,20 @@ public class Order {
         this.deliveryDistance = 0;
         this.deliveryFee = 0;
         this.finalBill = getTotal();
+    }
+
+    /**
+     * Prevents changes to delivery information
+     * after the order has been delivered.
+     *
+     * Payment recording is handled separately
+     * and remains possible after delivery.
+     */
+    private void ensureModifiable() {
+        if (status == OrderStatus.DELIVERED) {
+            throw new IllegalStateException(
+                "Delivered orders cannot be modified");
+        }
     }
 
     /**
@@ -124,20 +138,27 @@ public class Order {
     /**
      * Updates the order status.
      *
+     * Delivered orders cannot change status.
+     * Lifecycle validation is handled by DeliveryService.
+     *
      * @param status the new order status
      * @throws IllegalArgumentException if status is null
+     * @throws IllegalStateException if already delivered
      */
     public void setStatus(OrderStatus status) {
+
         if (status == null) {
             throw new IllegalArgumentException("Status cannot be null");
         }
+
+        ensureModifiable();
         this.status = status;
     }
 
     /**
-     * Returns the driver assigned to the order.
+     * Returns the assigned driver.
      *
-     * @return the assigned driver, or null if none
+     * @return assigned driver, or null
      */
     public Driver getAssignedDriver() {
         return assignedDriver;
@@ -149,14 +170,14 @@ public class Order {
      * @param driver the driver to assign
      */
     public void setAssignedDriver(Driver driver) {
+        ensureModifiable();
         this.assignedDriver = driver;
     }
 
     /**
-     * Calculates the subtotal of all ordered items.
+     * Calculates the subtotal of ordered items.
      *
-     * @return subtotal before pricing adjustments
-     *         and delivery fees
+     * @return subtotal before delivery fees
      */
     public double getTotal() {
 
@@ -172,7 +193,7 @@ public class Order {
     /**
      * Returns the delivery distance.
      *
-     * @return the delivery distance in kilometers
+     * @return distance in kilometers
      */
     public double getDeliveryDistance() {
         return deliveryDistance;
@@ -181,11 +202,13 @@ public class Order {
     /**
      * Updates the delivery distance.
      *
-     * @param distance the delivery distance in kilometers
-     * @throws IllegalArgumentException if the distance
-     *         is negative, infinite, or NaN
+     * @param distance delivery distance
+     * @throws IllegalArgumentException if invalid
      */
     public void setDeliveryDistance(double distance) {
+
+        ensureModifiable();
+
         if (Double.isNaN(distance) || Double.isInfinite(distance)
                 || distance < 0) {
             throw new IllegalArgumentException("Invalid distance");
@@ -197,7 +220,7 @@ public class Order {
     /**
      * Returns the delivery fee.
      *
-     * @return the delivery fee
+     * @return delivery fee
      */
     public double getDeliveryFee() {
         return deliveryFee;
@@ -206,12 +229,15 @@ public class Order {
     /**
      * Updates the delivery fee.
      *
-     * @param deliveryFee the new delivery fee
-     * @throws IllegalArgumentException if the fee
-     *         is negative, infinite, or NaN
+     * @param deliveryFee new delivery fee
+     * @throws IllegalArgumentException if invalid
      */
     public void setDeliveryFee(double deliveryFee) {
-        if (Double.isNaN(deliveryFee) || Double.isInfinite(deliveryFee)
+
+        ensureModifiable();
+
+        if (Double.isNaN(deliveryFee)
+                || Double.isInfinite(deliveryFee)
                 || deliveryFee < 0) {
             throw new IllegalArgumentException("Invalid delivery fee");
         }
@@ -222,7 +248,7 @@ public class Order {
     /**
      * Returns the final bill amount.
      *
-     * @return the final bill
+     * @return final bill
      */
     public double getFinalBill() {
         return finalBill;
@@ -231,12 +257,15 @@ public class Order {
     /**
      * Updates the final bill amount.
      *
-     * @param finalBill the new final bill
-     * @throws IllegalArgumentException if the amount
-     *         is negative, infinite, or NaN
+     * @param finalBill new final bill
+     * @throws IllegalArgumentException if invalid
      */
     public void setFinalBill(double finalBill) {
-        if (Double.isNaN(finalBill) || Double.isInfinite(finalBill)
+
+        ensureModifiable();
+
+        if (Double.isNaN(finalBill)
+                || Double.isInfinite(finalBill)
                 || finalBill < 0) {
             throw new IllegalArgumentException("Invalid final bill");
         }
@@ -247,30 +276,33 @@ public class Order {
     /**
      * Returns the current payment status.
      *
-     * @return the payment status
+     * @return payment status
      */
     public PaymentStatus getPaymentStatus() {
         return paymentStatus;
     }
 
     /**
-     * Returns the payment method used for the order.
+     * Returns the payment method.
      *
-     * @return the payment method, or null if not set
+     * @return payment method, or null
      */
     public String getPaymentMethod() {
         return paymentMethod;
     }
 
     /**
-     * Marks the order as paid using the specified
-     * payment method.
+     * Marks the order as paid.
+     *
+     * Cash payment may be recorded after delivery.
+     * PaymentService validates the payment before
+     * calling this method.
      *
      * @param method the payment method
-     * @throws IllegalArgumentException if the payment
-     *         method is null or blank
+     * @throws IllegalArgumentException if method is invalid
      */
     public void markAsPaid(String method) {
+
         if (method == null || method.trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid payment method");
         }
